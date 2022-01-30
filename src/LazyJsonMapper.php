@@ -202,7 +202,7 @@ use stdClass;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @author SteveJobzniak (https://github.com/SteveJobzniak)
  */
-class LazyJsonMapper implements Serializable, JsonSerializable
+class LazyJsonMapper implements JsonSerializable
 {
     /**
      * Whether "direct virtual properties" access is enabled.
@@ -1449,6 +1449,7 @@ class LazyJsonMapper implements Serializable, JsonSerializable
      * @see LazyJsonMapper::asJson()
      * @see LazyJsonMapper::printJson()
      */
+    #[\ReturnTypeWillChange]
     final public function jsonSerialize()
     {
         // Create a fully-validated, fully-converted final object-tree.
@@ -2147,9 +2148,6 @@ class LazyJsonMapper implements Serializable, JsonSerializable
         } elseif ($translation->camelPropName !== null
                   && $this->_hasPropertyDefinitionOrData($translation->camelPropName)) {
             $propName = $translation->camelPropName; // We found camel instead.
-        } elseif ($translation->dotPropName !== null
-                  && $this->_hasPropertyDefinitionOrData($translation->dotPropName)) {
-            $propName = $translation->dotPropName; // We found dot instead.
         } else {
             // This object doesn't have the requested property! If this is a
             // hasX() call, simply return false. In all other cases, throw!
@@ -2512,7 +2510,11 @@ class LazyJsonMapper implements Serializable, JsonSerializable
 
         try {
             // NOTE: This will ALWAYS succeed if the JSON data array is pure.
-            $serialized = serialize($objectData); // Throws.
+            if (version_compare(PHP_VERSION, '8.1.0', '>=')) {
+                $serialized = __serialize($objectData); // Throws.
+            } else {
+                $serialized = Serializable::serialize($objectData); // Throws.
+            }
         } catch (\Exception $e) { // IMPORTANT: Catch ANY exception!
             // This can literally ONLY happen if the user has given us (and now
             // wants to serialize) non-JSON data containing other objects that
@@ -2595,7 +2597,11 @@ class LazyJsonMapper implements Serializable, JsonSerializable
             // NOTE: If the original object only contained perfect JSON data,
             // then there are no sub-objects. But if any sub-objects existed
             // within the data, this will recursively unserialize those too.
-            $objectData = unserialize($serialized); // Throws.
+            if (version_compare(PHP_VERSION, '8.1.0', '>=')) {
+                $objectData = __unserialize($serialized); // Throws.
+            } else {
+                $objectData = Serializable::unserialize($serialized); // Throws.
+            }
         } catch (\Exception $e) { // IMPORTANT: Catch ANY exception!
             // This can literally ONLY happen if the user had given us (and then
             // serialized) non-JSON data containing other objects that attempt
