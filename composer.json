@@ -1,5 +1,5 @@
 {
-    "name": "lazyjsonmapper/lazyjsonmapper",
+    "name": "sergeykomlev/lazyjsonmapper",
     "type": "library",
     "description": "Advanced, intelligent & automatic object-oriented JSON containers for PHP.",
     "keywords": ["json", "development"],
@@ -9,6 +9,11 @@
         {
             "name": "SteveJobzniak",
             "homepage": "https://github.com/SteveJobzniak",
+            "role": "Developer"
+        },
+        {
+            "name": "Sergey Komlev",
+            "homepage": "https://github.com/sergeykomlev",
             "role": "Developer"
         }
     ],
